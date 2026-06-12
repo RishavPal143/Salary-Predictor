@@ -446,9 +446,20 @@ with tab_predict:
     # Get config variables for local scale conversion
     _, ex_rate, symbol, code, _ = LOCATION_CONFIG.get(location, (1.00, 1.00, "$", "USD", 0.25))
     
-    role_avg_local = stats["avg_by_role_adj"].get(selected_role, stats["avg_salary_adj"]) * ex_rate
-    role_min_local = stats["min_by_role_adj"].get(selected_role, stats["min_salary_adj"]) * ex_rate
-    role_max_local = stats["max_by_role_adj"].get(selected_role, stats["max_salary_adj"]) * ex_rate
+    # Filter dataset for the selected location and job title to get realistic local scale range
+    df_loc_role = df[(df["location"] == location) & (df["job_title"] == selected_role)]
+    if not df_loc_role.empty:
+        role_min_local = df_loc_role["salary_local"].min()
+        role_max_local = df_loc_role["salary_local"].max()
+        role_avg_local = df_loc_role["salary_local"].mean()
+    else:
+        role_avg_local = stats["avg_by_role_adj"].get(selected_role, stats["avg_salary_adj"]) * ex_rate
+        role_min_local = stats["min_by_role_adj"].get(selected_role, stats["min_salary_adj"]) * ex_rate
+        role_max_local = stats["max_by_role_adj"].get(selected_role, stats["max_salary_adj"]) * ex_rate
+
+    # Dynamically expand gauge range to fit prediction if it goes slightly outside bounds
+    gauge_min = min(role_min_local, predicted_salary_local) * 0.95
+    gauge_max = max(role_max_local, predicted_salary_local) * 1.05
     
     st.markdown(f"""
     <div class="kpi-container">
@@ -511,14 +522,14 @@ with tab_predict:
             number={'prefix': symbol, 'valueformat': ",.0f", 'font': {'size': 26, 'color': "#FFFFFF"}},
             domain={'x': [0, 1], 'y': [0, 1]},
             gauge={
-                'axis': {'range': [role_min_local, role_max_local], 'tickformat': f"{symbol},.0f", 'tickcolor': "#A0AEC0"},
+                'axis': {'range': [gauge_min, gauge_max], 'tickformat': f"{symbol},.0f", 'tickcolor': "#A0AEC0"},
                 'bar': {'color': '#4D96FF'},
                 'bgcolor': "rgba(255,255,255,0.03)",
                 'borderwidth': 1,
                 'bordercolor': "rgba(255,255,255,0.1)",
                 'steps': [
-                    {'range': [role_min_local, role_avg_local], 'color': 'rgba(255, 107, 107, 0.08)'},
-                    {'range': [role_avg_local, role_max_local], 'color': 'rgba(107, 203, 119, 0.08)'}
+                    {'range': [gauge_min, role_avg_local], 'color': 'rgba(255, 107, 107, 0.08)'},
+                    {'range': [role_avg_local, gauge_max], 'color': 'rgba(107, 203, 119, 0.08)'}
                 ],
                 'threshold': {
                     'line': {'color': '#FFD93D', 'width': 3},
