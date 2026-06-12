@@ -128,4 +128,4 @@ Or run the module directly:
 ```bash
 python3 -m streamlit run app.py
 ```
-Open the provided URL (default `http://localhost:8501`) in your browser to interact with the app.
+Open the provided URL (default https://smart-salary-predictor.streamlit.app/) in your browser to interact with the app.
