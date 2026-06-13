@@ -6,7 +6,7 @@ import os
 import plotly.express as px
 import plotly.graph_objects as go
 
-# Set page configuration
+
 st.set_page_config(
     page_title="SmartSalary Predictor & Analytics",
     page_icon="💼",
