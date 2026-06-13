@@ -17,8 +17,7 @@ st.set_page_config(
 # Load resources
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Geographic market adjustments configuration to align synthetic data with real-world scales
-# Format: { "Location": (Realistic USD Adjustment Factor, Exchange Rate from USD, Symbol, Currency Code, Experience Boost Factor) }
+
 LOCATION_CONFIG = {
     "USA": (1.00, 1.00, "$", "USD", 0.25),
     "Canada": (0.75, 1.36, "C$", "CAD", 0.35),
