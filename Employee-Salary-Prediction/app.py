@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load resources
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -27,7 +27,7 @@ LOCATION_CONFIG = {
     "Sweden": (0.45, 10.50, "kr", "SEK", 0.30),
     "Australia": (0.72, 1.50, "A$", "AUD", 0.35),
     "Singapore": (0.80, 1.35, "S$", "SGD", 0.35),
-    "India": (0.16, 83.50, "₹", "INR", 0.90), # Steeper career growth curve (at least 1.5x, up to 2.7x over 20 yrs)
+    "India": (0.16, 83.50, "₹", "INR", 0.90), 
     "Remote": (0.85, 1.00, "$", "USD", 0.30)
 }
 
@@ -91,7 +91,7 @@ def load_dataset_and_stats():
 model, label_encoders = load_model_and_encoders()
 df, stats = load_dataset_and_stats()
 
-# Inject Premium CSS Styling
+
 st.markdown("""
 <style>
     /* Import Premium Fonts */
@@ -291,13 +291,13 @@ def make_prediction(job_title, experience, education, skills, industry, company_
         certifications
     ]], columns=features)
     
-    # Model returns the base prediction in dataset scale (inflated USD)
+
     raw_pred = model.predict(encoded_input)[0]
     
-    # Apply adjustment factor and exchange rate to localize the salary
+
     adj_factor, ex_rate, symbol, code, exp_boost = LOCATION_CONFIG.get(location, (1.00, 1.00, "$", "USD", 0.25))
     
-    # Calculate non-linear experience scaling boost
+
     exp_factor = 1.0 + (experience / 20.0) * exp_boost
     
     adjusted_usd = raw_pred * adj_factor * exp_factor
@@ -305,7 +305,7 @@ def make_prediction(job_title, experience, education, skills, industry, company_
     
     return raw_pred, adjusted_usd, local_currency_sal, symbol, code
 
-# Career boost recommendations simulator in local currency
+
 def simulate_career_boosts_local(curr_profile):
     boosts = []
     _, _, base_local, symbol, code = make_prediction(
@@ -353,19 +353,19 @@ def simulate_career_boosts_local(curr_profile):
         mod["education"] = target_edu
         check_boost(mod, f"Upgrade degree to {target_edu}", "Education Upgradation")
         
-    # 2. Certifications Scenario (limit to 5)
+
     if curr_profile["certifications"] < 4:
         mod = curr_profile.copy()
         mod["certifications"] = curr_profile["certifications"] + 1
         check_boost(mod, "Earn 1 extra Professional Certification", "Certifications")
 
-    # 3. Skills Expansion Scenario (limit to 19)
+
     if curr_profile["skills"] < 17:
         mod = curr_profile.copy()
         mod["skills"] = curr_profile["skills"] + 2
         check_boost(mod, "Acquire 2 new specialized skills", "Skills Expansion")
         
-    # 4. Company Scale Scenario
+
     curr_size = curr_profile["company_size"]
     if curr_size in ["Startup", "Small", "Medium"]:
         target_size = "Enterprise"
@@ -373,13 +373,13 @@ def simulate_career_boosts_local(curr_profile):
         mod["company_size"] = target_size
         check_boost(mod, f"Transition to an {target_size} corporation", "Company Shift")
 
-    # 5. Remote Work Status Shift
+
     if curr_profile["remote"] == "No":
         mod = curr_profile.copy()
         mod["remote"] = "Yes"
         check_boost(mod, "Transition to a fully Remote role", "Remote Premium")
         
-    # 6. Promotion / Experience Gain (limit to 20)
+
     if curr_profile["experience"] < 19:
         mod = curr_profile.copy()
         mod["experience"] = curr_profile["experience"] + 2
@@ -387,7 +387,7 @@ def simulate_career_boosts_local(curr_profile):
         
     return pd.DataFrame(boosts)
 
-# Header Section
+
 st.markdown("""
 <div class="hero-container">
     <div class="hero-title">SmartSalary Predictor</div>
@@ -397,11 +397,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# SIDEBAR: Profile Inputs for Primary Analysis
+
 st.sidebar.markdown("### 👤 Candidate Profile")
 st.sidebar.markdown("Adjust attributes below to simulate predictions dynamically.")
 
-# Categorical selects
+
 selected_role = st.sidebar.selectbox("Job Title", stats["roles"], index=stats["roles"].index("Software Engineer") if "Software Engineer" in stats["roles"] else 0)
 education = st.sidebar.selectbox("Education Level", stats["education"], index=stats["education"].index("Bachelor") if "Bachelor" in stats["education"] else 0)
 industry = st.sidebar.selectbox("Industry", stats["industries"], index=stats["industries"].index("Technology") if "Technology" in stats["industries"] else 0)
@@ -414,7 +414,7 @@ experience = st.sidebar.slider("Years of Experience", 0, 20, 5)
 skills = st.sidebar.slider("Skills Count", 1, 19, 6)
 certifications = st.sidebar.slider("Certifications Count", 0, 5, 2)
 
-# Pack sidebar inputs into a profile dictionary
+
 current_profile = {
     "job_title": selected_role,
     "experience": experience,
@@ -438,11 +438,9 @@ tab_predict, tab_pathfinder, tab_analytics, tab_compare = st.tabs([
     "👥 Profile Comparator"
 ])
 
-# ==========================================
-# TAB 1: PREDICT SALARY
-# ==========================================
+
 with tab_predict:
-    # Get config variables for local scale conversion
+
     _, ex_rate, symbol, code, _ = LOCATION_CONFIG.get(location, (1.00, 1.00, "$", "USD", 0.25))
     
     # Filter dataset for the selected location and job title to get realistic local scale range
