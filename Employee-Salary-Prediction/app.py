@@ -443,7 +443,7 @@ with tab_predict:
 
     _, ex_rate, symbol, code, _ = LOCATION_CONFIG.get(location, (1.00, 1.00, "$", "USD", 0.25))
     
-    # Filter dataset for the selected location and job title to get realistic local scale range
+    
     df_loc_role = df[(df["location"] == location) & (df["job_title"] == selected_role)]
     if not df_loc_role.empty:
         role_min_local = df_loc_role["salary_local"].min()
@@ -491,7 +491,7 @@ with tab_predict:
         </div>
         """, unsafe_allow_html=True)
         
-        # Comparison delta badge in local currency
+     
         diff = predicted_salary_local - role_avg_local
         diff_pct = (diff / role_avg_local) * 100
         if diff >= 0:
@@ -512,7 +512,7 @@ with tab_predict:
             """, unsafe_allow_html=True)
             
     with col_gauge:
-        # Build interactive Plotly Gauge Indicator in local currency
+
         fig_gauge = go.Figure(go.Indicator(
             mode="gauge+number",
             value=predicted_salary_local,
@@ -564,14 +564,12 @@ with tab_predict:
         skills=skills, loc=location, rem=remote, cert=certifications
     ), unsafe_allow_html=True)
 
-# ==========================================
-# TAB 2: CAREER PATHFINDER
-# ==========================================
+
 with tab_pathfinder:
     st.markdown("### 📈 Career Salary Optimizer")
     st.markdown("Discover which strategic adjustments to your profile would drive the highest financial returns in your local market.")
     
-    # Run simulation
+
     df_boosts = simulate_career_boosts_local(current_profile)
     
     if len(df_boosts) > 0:
@@ -613,14 +611,12 @@ with tab_pathfinder:
     else:
         st.info("You've already maximized all features in the simulator! Add more variables or lower some baseline parameters to run predictions.")
 
-# ==========================================
-# TAB 3: MARKET INSIGHTS
-# ==========================================
+
 with tab_analytics:
     st.markdown("### 📊 Market Payroll Analysis")
     st.markdown("Comparative metrics scaled to **Realistic USD** (adjusted for local purchasing power index) to ensure fair comparisons.")
     
-    # Render global dataset statistics in adjusted USD
+
     st.markdown(f"""
     <div style="display: flex; gap: 15px; margin-bottom: 25px;">
         <div style="flex:1; background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.05); padding:15px; border-radius:10px; text-align:center;">
@@ -641,9 +637,9 @@ with tab_analytics:
     row1_col1, row1_col2 = st.columns(2)
     
     with row1_col1:
-        # 1. Experience curves (in adjusted USD)
+
         exp_role_sal = df.groupby(["experience_years", "job_title"])["salary_usd_adj"].mean().reset_index()
-        # Filterable multi-select roles
+
         selected_roles_plot = st.multiselect(
             "Select Roles to Compare Experience Curves",
             stats["roles"],
